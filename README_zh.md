@@ -63,7 +63,7 @@ DPB &= \alpha \cdot text\_score + \beta \cdot display\_formula\_score + \gamma \
 - 依赖声明见 `pyproject.toml`
 
 ```
-git clone https://github.com/SoMarkAI/docparsingbench.git
+git clone https://github.com/SoMarkAI/DocParsingBench.git
 cd docparsingbench
 
 pip install .

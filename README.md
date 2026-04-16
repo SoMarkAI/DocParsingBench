@@ -62,7 +62,7 @@ Standalone HTML leaderboard:
 - Dependencies are declared in `pyproject.toml`
 
 ```bash
-git clone https://github.com/SoMarkAI/docparsingbench.git
+git clone https://github.com/SoMarkAI/DocParsingBench.git
 cd docparsingbench
 
 pip install .

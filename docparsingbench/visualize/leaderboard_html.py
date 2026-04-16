@@ -877,7 +877,7 @@ body.saving .cursor-tip {
                     <div class="hero__meta-block">
                         <span class="hero__section-title">Project Resources · Repo & Datasets</span>
                         <div class="hero__links" aria-label="Project resources">
-                            <a class="hero-link" href="https://github.com/SoMarkAI/docparsingbench" target="_blank" rel="noopener">
+                            <a class="hero-link" href="https://github.com/SoMarkAI/DocParsingBench" target="_blank" rel="noopener">
                                 <span class="hero-link__icon"><svg viewBox="0 0 24 24"><path d="M12 .297C5.373.297 0 5.67 0 12.297c0 5.302 3.438 9.8 8.207 11.387.6.113.793-.26.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.757-1.333-1.757-1.089-.745.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.605-2.665-.306-5.467-1.334-5.467-5.933 0-1.311.468-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.553 3.297-1.23 3.297-1.23.654 1.653.243 2.873.119 3.176.77.84 1.235 1.911 1.235 3.221 0 4.61-2.807 5.624-5.479 5.92.43.372.823 1.102.823 2.222v3.293c0 .32.192.694.8.576C20.566 22.094 24 17.6 24 12.297 24 5.67 18.627.297 12 .297"/></svg></span>
                                 <span>GitHub ↗</span>
                             </a>
