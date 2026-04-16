@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=66,<71", "packaging>=22"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docparsingbench"
+version = "0.1.0"
+description = "DocParsingBench: an intelligent document-parsing evaluation toolkit with automatic Markdown block-matching assessment."
+authors = [{name = "KevinQiu", email = "qiubinyang@soulcode.cn"}]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+]
+dependencies = [
+    "PyYAML",
+    "numpy",
+    "tqdm",
+    "levenshtein",
+    "beautifulsoup4",
+    "apted",
+    "opencv-python-headless",
+    "scipy",
+    "fastcdm",
+    "gradio>=4.44.1,<5",
+    "huggingface_hub>=0.23,<1.0",
+    "fastapi==0.112.2",
+    "starlette==0.37.2",
+    "pydantic==2.10.6",
+    "mistune",
+    "matplotlib",
+]
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
+
+[project.scripts]
+dpb = "docparsingbench.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["docparsingbench*"]

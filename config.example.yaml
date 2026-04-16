@@ -1,0 +1,80 @@
+# DocParsingBench configuration example (config.yaml)
+# Note: All fields map 1:1 to the internal Config dataclass; defaults shown in comments.
+# Usage: Copy this file to config.yaml, modify as needed, then pass via --config in the CLI.
+
+# Optional chromedriver path (used by fastcdm).
+# - Leave empty or set to null: fastcdm uses its own default; this project passes None.
+# - Set to a specific path: e.g. ./chromedriver or /usr/local/bin/chromedriver.
+chromedriver_path: /home/soulcode/apps/fastcdm/fastcdm/render/driver/chromedriver
+
+# Whether to enable visualization during debugging (related to internal workflow, not required).
+visualize: false
+
+# Whether to drop images from content, default true
+drop_img: true
+
+# Whether to skip paragraphs containing chemical structures (\smiles{}), default true
+skip_chemical: true
+
+# Paragraph (text segment) configuration
+paragraph:
+  # Metric for paragraph-level Hungarian matching; current implementation uses NED to build text cost matrix.
+  # Options: "NED" (recommended).
+  match_metric: "NED"
+
+  # Inline formula placeholder: during segmentation, `$...$` or `\(...\)` are replaced with this placeholder.
+  # For example, change to "[MATH]" to aid alignment debugging.
+  formula_placeholder: "[FORMULA]"
+
+# Formula configuration (display formula + inline formula scoring metric)
+formula:
+  # Formula comparison metric; used for final scoring (display) and inline formula average in text segments.
+  # Options: "CDM" (recommended) or "NED" (fallback).
+  metric: "CDM"
+
+  # Hungarian matching metric for formulas; current implementation uses CDM f1 as similarity, kept for future extension.
+  # Options: "NED", "CDM" (recommend keeping "NED" or leaving unchanged).
+  match_metric: "NED"
+
+# Table configuration
+table:
+  # Structure only (TEDS-S) or structure + content (TEDS).
+  structure_only: false
+
+  # Table matching metric; current implementation uses TEDS/TEDS-S, kept for future extension.
+  # Options: "TEDS" (recommended), "TEDS-S" (structure only), "NED".
+  match_metric: "TEDS"
+
+# DPB overall weight configuration
+DPB:
+  # Weight preset: preset defaults are applied first, then overridden by explicit alpha/beta/gamma.
+  # Options: general | paper | financial
+  # - general: alpha=0.5, beta=0.3, gamma=0.2 (balanced)
+  # - paper: alpha=0.3, beta=0.5, gamma=0.2 (formula-heavy)
+  # - financial: alpha=0.6, beta=0.2, gamma=0.2 (text-heavy)
+  preset: "general"
+
+  # If explicitly provided, overrides the corresponding preset default.
+  alpha: 0.5  # Also used in text_score: text_score = alpha * avg(1 - NED) + (1 - alpha) * avg(CDM-inline)
+  beta: 0.3
+  gamma: 0.2
+
+# Performance profiling (only measures evaluation stage duration, excludes external model inference latency)
+perf:
+  # Whether to enable performance collection: records segmentation time, matching time, total time, and document throughput.
+  enable: false
+
+# Progress display (tqdm progress bar and stage prompts)
+progress:
+  # Whether to enable progress bar and stage prompt printing
+  enable: true
+
+# Summary chart generation after batch eval
+summary_chart:
+  # Set false to skip auto-generation after dpb eval (batch mode)
+  enable: true
+  # Output path, relative to the --out result file directory
+  output_path: "summary_chart.png"
+  # Y-axis display range for summary chart
+  y_min: 30
+  y_max: 100

@@ -1,0 +1,64 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.Python
+build/
+dist/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Editors
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mplconfig/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+uv.lock
+.trae/
+driver/
+**/**/chromedriver
+data/
+# CDM bad case analysis files (generated during evaluation)
+cdm_badcase/
+
+# Installed package metadata
+docparsingbench.egg-info/
+
+# Local config overrides
+config.local.yaml
+
+# Docker
+Dockerfile
+
+# Local tools / scripts
+tools/
+
+# Claude Code
+.claude/
+CLAUDE.local.md

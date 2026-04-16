@@ -1,0 +1,25 @@
+# GLM-OCR configuration example
+pipeline:
+  maas:
+    enabled: false
+
+  ocr_api:
+    api_host: <vllm_host>
+    api_port: <vllm_port>
+    model: <model_name>
+    api_path: /v1/chat/completions
+    api_mode: openai
+    connect_timeout: 30
+    request_timeout: 300
+
+  page_loader:
+    max_tokens: 4096
+    temperature: 0.0
+
+
+  result_formatter:
+    output_format: both
+
+  layout:
+    model_dir: PaddlePaddle/PP-DocLayoutV3_safetensors
+    device: <layout_device>  #  cpu or cuda[:device_id]
