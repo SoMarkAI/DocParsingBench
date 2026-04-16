@@ -25,7 +25,26 @@ DocParsingBench is an evaluation toolkit **purpose-built for intelligent documen
 
 > If this project helps you, please consider giving it a ⭐ Star in the top-right corner. Your support is a huge encouragement to the team.
 
-### Metric Overview
+## Latest Updates
+
+**[2026.04.17]** [DocParsingBench](https://github.com/SoMarkAI/DocParsingBench) evaluation toolkit release. It will provide unified scoring for the three core elements of document parsing: **text, formula, and table**, along with **CLI batch evaluation, segment matching, visualization analysis, and leaderboard generation**. 📊
+
+**[2026.03.09]** DocParsingBench dataset release. The first intelligent document parsing dataset built for real industry scenarios, covering finance, legal, scientific research, manufacturing, and education. Now available on [Hugging Face](https://huggingface.co/datasets/SoMarkAI/DocParsingBench)、[ModelScope](https://modelscope.cn/datasets/SoMark/DocParsingBench)！🔥🔥🔥
+
+## Dataset
+
+We systematically collected and annotated document samples from real business workflows, preserving **scan noise, stamp occlusion, and blurry characters**.
+
+| Dimension | Category |
+|------|------|
+| **Total Samples** | 1400 pages |
+| **Languages** | Chinese, English, bilingual |
+| **Industry Coverage** | Finance / Legal / Scientific Research / Manufacturing / Education |
+| **Layout Coverage** | Single-column / Double-column / Triple-column / Mixed |
+| **Annotation Format** | Markdown |
+| **Chemical Annotation** | Uses the [SoMarkdown](https://github.com/SoMarkAI/SoMarkDown) specification, combining SMILES with LaTeX to render chemical structure formulas completely |
+
+## Metric Overview
 
 DocParsingBench is an evaluation toolkit for document parsing. It takes two Markdown files (prediction and ground truth), performs segment-level matching and scoring by category, and outputs both overall and per-category scores with reusable metric wrappers and visualization tools.
 
