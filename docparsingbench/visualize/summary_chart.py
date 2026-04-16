@@ -34,7 +34,7 @@ GRID_COLOR = "#CCCCCC"
 FONT_SCALE = 1.2
 
 TITLE_SIZE = 14 * FONT_SCALE
-HEADER_SIZE = 24 * FONT_SCALE
+HEADER_SIZE = 24 * FONT_SCALE * 1.2
 AXIS_LABEL_SIZE = 12 * FONT_SCALE
 TICK_SIZE = 10 * FONT_SCALE
 LEGEND_SIZE = 12 * FONT_SCALE
@@ -80,7 +80,7 @@ def _draw_header(fig: plt.Figure) -> None:
     _add_logo(fig)
     fig.text(
         0.082,
-        0.95,
+        0.942,
         "DocParsingBench Summary",
         fontsize=HEADER_SIZE,
         fontweight="bold",
@@ -112,6 +112,7 @@ def _draw_bars(
     y_label: Optional[str],
     y_limits: Tuple[float, float],
     show_main_x_labels: bool,
+    title_position: str = "top",
 ) -> None:
     values = [getattr(model, metric) * 100 for model in models]
     x_positions = list(range(len(models)))
@@ -126,7 +127,18 @@ def _draw_bars(
         zorder=3,
     )
 
-    ax.set_title(title, fontsize=TITLE_SIZE, fontweight="bold", color="#111111", pad=18)
+    if title_position == "bottom":
+        ax.set_title("")
+        ax.set_xlabel(
+            title,
+            fontsize=TITLE_SIZE,
+            fontweight="bold",
+            color="#111111",
+            labelpad=14,
+        )
+    else:
+        ax.set_title(title, fontsize=TITLE_SIZE, fontweight="bold", color="#111111", pad=18)
+        ax.set_xlabel("")
     ax.set_ylim(*y_limits)
     if y_label:
         ax.set_ylabel(y_label, fontsize=AXIS_LABEL_SIZE, color="#111111")
@@ -137,7 +149,7 @@ def _draw_bars(
         ax.set_xticks(x_positions)
         ax.set_xticklabels(
             [model.display_name for model in models],
-            rotation=40,
+            rotation=25,
             ha="right",
             rotation_mode="anchor",
             fontsize=TICK_SIZE,
@@ -288,6 +300,7 @@ def generate_summary_chart_from_agg(
         y_label="Score (%)",
         y_limits=y_limits,
         show_main_x_labels=False,
+        title_position="bottom",
     )
     _draw_bars(
         ax_formula,
@@ -298,6 +311,7 @@ def generate_summary_chart_from_agg(
         y_label=None,
         y_limits=y_limits,
         show_main_x_labels=False,
+        title_position="bottom",
     )
     _draw_bars(
         ax_table,
@@ -308,6 +322,7 @@ def generate_summary_chart_from_agg(
         y_label=None,
         y_limits=y_limits,
         show_main_x_labels=False,
+        title_position="bottom",
     )
 
     # Bottom three charts: keep y-axis numbers, remove x-axis labels.
@@ -318,7 +333,7 @@ def generate_summary_chart_from_agg(
     _draw_legend_panel(ax_legend, models, styles)
     _draw_header(fig)
 
-    fig.subplots_adjust(top=0.84, left=0.065, right=0.98, bottom=0.08)
+    fig.subplots_adjust(top=0.81, left=0.065, right=0.98, bottom=0.08)
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
