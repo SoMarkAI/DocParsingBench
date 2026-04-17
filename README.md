@@ -298,3 +298,7 @@ This project reserves hooks and a unified output schema for performance benchmar
   - `notes`: external model invocation marker (empty by default or filled by upper layers)
 
 Benchmark speed reporting should use evaluation-phase runtime + document throughput, excluding external model generation latency. External model latency should be recorded by upper-layer systems.
+
+## WeChat Group
+
+![WeChat Group QR Code](./assets/wechat-group-qr-code.png)
