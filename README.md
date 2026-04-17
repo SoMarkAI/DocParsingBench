@@ -63,17 +63,31 @@ DPB &= \alpha \cdot text\_score + \beta \cdot display\_formula\_score + \gamma \
 \end{aligned}
 ```
 
-## Quick Preview
+## Leaderboard Snapshot
 
-Summary chart:
+| **Rank** | **Methods**             | **DPB** | **Text** | **Formula** | **Table** |
+| -------- | ----------------------- | ------- | -------- | ----------- | --------- |
+| 1        | PaddleOCR-1.5           | 0.8535  | 0.8959   | 0.7527      | 0.7104    |
+| 2        | MonkeyOCR-Pro-3B        | 0.8260  | 0.8669   | 0.7206      | 0.7014    |
+| 3        | MinerU2.5               | 0.8164  | 0.8426   | 0.7993      | 0.7557    |
+| 4        | Qwen3-VL-235B-Instruct  | 0.7971  | 0.8496   | 0.4355      | 0.6691    |
+| 5        | ChandraOCR-2            | 0.7906  | 0.8361   | 0.7772      | 0.7242    |
+| 6        | Deepseek-OCR-2          | 0.7403  | 0.7917   | 0.6775      | 0.5741    |
+| 7        | GLM-OCR                 | 0.7348  | 0.7695   | 0.5773      | 0.5046    |
+| 8        | dots.ocr-1.5            | 0.6564  | 0.6885   | 0.6236      | 0.5655    |
+| 9        | HunyuanOCR              | 0.5128  | 0.5319   | 0.6018      | 0.6428    |
 
-![Summary Chart](./assets/summary-chart.png)
+## Visualization Overview
 
-Standalone HTML leaderboard:
+<div align="center">
+  <p><strong>Summary Chart</strong></p>
+  <img src="./assets/summary-chart.png" alt="Summary Chart" width="82%">
+</div>
 
-<p align="center">
-  <img src="./assets/leaderboard.png" alt="Standalone HTML leaderboard" width="90%">
-</p>
+<div align="center">
+  <p><strong>Interactive Leaderboard</strong></p>
+  <img src="./assets/leaderboard.png" alt="Interactive Leaderboard" width="53%">
+</div>
 
 ## Installation
 
@@ -187,10 +201,10 @@ dpb eval \
   --out data/results/some_model_md.result.json
 ```
 
-### Standalone HTML Leaderboard (`leaderboard-html`)
+### Interactive HTML Leaderboard (`leaderboard-html`)
 
-Generates a single self-contained `.html` file — open it in any browser
-or share it directly (no server required).
+Generates a single self-contained `.html` file with interactive sorting
+and filtering. Open it in any browser or share it directly without a server.
 
 ```bash
 dpb leaderboard-html \
