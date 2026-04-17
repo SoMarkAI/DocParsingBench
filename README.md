@@ -63,7 +63,7 @@ DPB &= \alpha \cdot text\_score + \beta \cdot display\_formula\_score + \gamma \
 \end{aligned}
 ```
 
-## Leaderboard Snapshot
+## Evaluation Leaderboard
 
 | **Rank** | **Methods**             | **DPB** | **Text** | **Formula** | **Table** |
 | -------- | ----------------------- | ------- | -------- | ----------- | --------- |
@@ -76,8 +76,6 @@ DPB &= \alpha \cdot text\_score + \beta \cdot display\_formula\_score + \gamma \
 | 7        | GLM-OCR                 | 0.7348  | 0.7695   | 0.5773      | 0.5046    |
 | 8        | dots.ocr-1.5            | 0.6564  | 0.6885   | 0.6236      | 0.5655    |
 | 9        | HunyuanOCR              | 0.5128  | 0.5319   | 0.6018      | 0.6428    |
-
-## Visualization Overview
 
 <div align="center">
   <p><strong>Summary Chart</strong></p>
