@@ -301,3 +301,7 @@ class MyModelRunner(BaseModelRunner):
   - `notes`: 外部模型调用的标识（留空或由上层填充）
 
 在 README 中说明统一口径：速度以“评测阶段耗时 + 文档吞吐”为主，不包含外部模型生成时延；外部模型时延由上层系统记录。
+
+## 企业微信群
+
+![WeChat Group QR Code](./assets/wechat-group-qr-code.png)
