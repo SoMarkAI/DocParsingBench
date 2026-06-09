@@ -16,12 +16,14 @@ English | [中文](./README_zh.md)
 
 ## Why DocParsingBench?
 
-DocParsingBench is an evaluation toolkit **purpose-built for intelligent document parsing products**, bridging academia and real‑world industry.
+DocParsingBench is an evaluation toolkit **purpose-built for intelligent document parsing products**. We open-source the evaluation dataset, complete evaluation methodology, and analysis tools so developers can compare document parsing models in a unified, reproducible, and diagnosable way.
 
-- **Industry‑aligned:** Built with real‑world enterprise documents, not just academic datasets.
-- **Compatible:** Directly compares GT Markdown vs. predicted Markdown. Works with any parsing solution.
-- **Optimal segment matching:** Segments by text, inline formulas, and tables, then matches within same types. More accurate than full‑text string comparison.
-- **Engineering-friendly:** CLI + quick start + visual dashboards. Easily plug into your model experiment pipeline for fast iteration.
+- **Data from real production scenarios:** All evaluation data is collected from real business scenarios, covering five industries: finance, legal, scientific research, manufacturing, and education, with 14 types of complex production documents.
+- **Open dataset and evaluation methodology:** DocParsingBench provides public data, a unified evaluation pipeline, and reproducible scoring, allowing different models to be compared with the same yardstick.
+- **More complete visual analysis:** Built-in visualization tools help locate exactly where a model fails, and support score breakdowns by business scenario to identify which document types a model handles reliably.
+- **Faster evaluation:** On the same model, OmniDocBench takes about 720s, OLMbench takes about 480s, while DocParsingBench takes only about 125s, making it better suited for frequent iteration and batch comparison.
+- **Higher model compatibility:** DocParsingBench evaluates the final Markdown output end to end without relying on any specific intermediate format, so most document parsing models can be plugged into the benchmark.
+- **More flexible scoring logic:** Segment matching and the Hungarian algorithm make the evaluation tolerant of multiple reasonable reading-order expressions, reducing false penalties caused by assuming a single canonical order.
 
 > If this project helps you, please consider giving it a ⭐ Star in the top-right corner. Your support is a huge encouragement to the team.
 
@@ -33,20 +35,28 @@ DocParsingBench is an evaluation toolkit **purpose-built for intelligent documen
 
 ## Dataset
 
-We systematically collected and annotated document samples from real business workflows, preserving **scan noise, stamp occlusion, and blurry characters**.
+We systematically collected and annotated document samples from real business workflows, preserving real-world noise such as **scan artifacts, stamp occlusion, and blurry characters**. The dataset contains **1400 pages**, covering Chinese, English, and mixed Chinese-English documents; layouts include single-column, double-column, triple-column, and mixed layouts. Annotations use Markdown, and chemical structures follow the [SoMarkdown](https://github.com/SoMarkAI/SoMarkDown) specification, combining SMILES with LaTeX to ensure complete rendering.
 
-| Dimension | Category |
-|------|------|
-| **Total Samples** | 1400 pages |
-| **Languages** | Chinese, English, bilingual |
-| **Industry Coverage** | Finance / Legal / Scientific Research / Manufacturing / Education |
-| **Layout Coverage** | Single-column / Double-column / Triple-column / Mixed |
-| **Annotation Format** | Markdown |
-| **Chemical Annotation** | Uses the [SoMarkdown](https://github.com/SoMarkAI/SoMarkDown) specification, combining SMILES with LaTeX to render chemical structure formulas completely |
+| Industry | Typical Documents | Key Characteristics |
+|-----------|----------|----------|
+| **Finance** | Brokerage research reports, annual reports of listed companies, prospectuses | Multi-column tables, stamped scanned documents, complex table structures |
+| **Legal** | Legal documents, contract clauses, industry standards | Standardized headers and footers, dense footnotes |
+| **Scientific Research** | Academic papers, programming textbooks, patent full texts | Double-column/multi-column mixed layouts, many formulas, code blocks, chemical equations |
+| **Manufacturing** | Operation SOPs, forms, invoices and receipts | Blurry scans, handwritten fields, QR/barcode interference |
+| **Education** | English, chemistry, and mathematics textbooks | Chemical structures, reaction equations, multiple-choice questions, fill-in-the-blank questions |
+| **Overall Coverage** | 1400 pages of real business documents | Chinese, English, and mixed Chinese-English; single-column, double-column, triple-column, and mixed layouts |
+
+## Visual Analysis Tool
+
+DocParsingBench provides a per-sample visual analysis interface that places the original page, ground-truth Markdown, predicted Markdown, and evaluation metrics in one view. Developers can filter results by industry, sub-industry, and sample to quickly locate errors across text, formulas, tables, and other document elements.
+
+<div align="center">
+  <img src="./assets/visual-analysis.jpeg" alt="Visual Analysis Tool" width="88%">
+</div>
 
 ## Metric Overview
 
-DocParsingBench is an evaluation toolkit for document parsing. It takes two Markdown files (prediction and ground truth), performs segment-level matching and scoring by category, and outputs both overall and per-category scores with reusable metric wrappers and visualization tools.
+Given two Markdown files (prediction and ground truth), DocParsingBench performs segment-level matching and scoring by category, and outputs both overall and per-category scores with reusable metric wrappers and visualization tools.
 
 - Segment categories: `text (with inline formulas)`, `display_formula`, `table`, `image` (currently dropped in evaluation)
 - Segmentation: text and display formulas are split by line boundaries; tables are bounded by `<table> ... </table>`
@@ -301,4 +311,4 @@ Benchmark speed reporting should use evaluation-phase runtime + document through
 
 ## WeChat Group
 
-![WeChat Group QR Code](./assets/wechat-group-qr-code.png)
+<img src="./assets/wechat-group-qr-code.png" alt="WeChat Group QR Code" width="120">
