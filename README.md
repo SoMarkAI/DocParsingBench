@@ -48,6 +48,18 @@ We systematically collected and annotated document samples from real business wo
 | **Education** | English, chemistry, and mathematics textbooks | Chemical structures, reaction equations, multiple-choice questions, fill-in-the-blank questions |
 | **Overall Coverage** | 1400 pages of real business documents | Chinese, English, and mixed Chinese-English; single-column, double-column, triple-column, and mixed layouts |
 
+## Evaluation Performance
+
+DocParsingBench significantly reduces overall evaluation time while preserving multi-dimensional evaluation for text, formulas, and tables; FastCDM further improves formula scoring throughput through a lighter formula rendering pipeline. Below are the evaluation performance results of olmOCR-2-7B on the three benchmarks.
+
+### 1. Evaluation Time Across Three Benchmarks
+
+<table><tr><td>Benchmark</td><td>Evaluation Items</td><td>Count</td><td>Total Time (s)</td><td>Time per Item (s)</td><td>Speed Ratio</td></tr><tr><td>OmniDocBench</td><td>Text + Formula CDM + Table TEDS</td><td>1,638 files</td><td>977</td><td>0.6</td><td>1x</td></tr><tr><td>olmOCR-bench</td><td>Math + Absent + Present + Order + Table</td><td>1,403 files</td><td>703</td><td>0.5</td><td>1.19x</td></tr><tr><td>DocParsingBench</td><td>Text NED + Formula CDM + Table TEDS</td><td>1,342 files</td><td>106.2</td><td>0.079</td><td>7.54x</td></tr></table>
+
+### 2. CDM vs FastCDM Speed Comparison
+
+<table><tr><td>Method</td><td>Rendering Engine</td><td>Formula Count</td><td>Total Time (s)</td><td>Formulas/s</td><td>Time per Item (s)</td><td>Speedup</td></tr><tr><td>CDM</td><td>TeX Live + ImageMagick</td><td>1,000</td><td>608</td><td>1.64</td><td>0.61</td><td>1x</td></tr><tr><td>FastCDM</td><td>Chrome + KaTeX</td><td>1,000</td><td>97</td><td>10.29</td><td>0.097</td><td>6.26x</td></tr></table>
+
 ## Visual Analysis Tool
 
 DocParsingBench provides a per-sample visual analysis interface that places the original page, ground-truth Markdown, predicted Markdown, and evaluation metrics in one view. Developers can filter results by industry, sub-industry, and sample to quickly locate errors across text, formulas, tables, and other document elements.
