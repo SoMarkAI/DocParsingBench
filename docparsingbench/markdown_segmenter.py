@@ -47,6 +47,11 @@ IMG_PATTERN_MD_BROKEN_OPEN = re.compile(r"!\[[^\n]*$")
 
 # Markdown pipe table separator row: `|---|`, `| --- |`, `|:---:|` and variants
 _MD_TABLE_SEP = re.compile(r"^\s*\|?[\s\|\-:]+\|[\s\|\-:]*$")
+_TOC_DOT_LEADER = re.compile(
+    r"(?<=\S)[ \t]*(?:\.[ \t]*){4,}"
+    r"(?=(?:\d+|[ivxlcdm]+)(?:[ \t]*[-\u2013\u2014][ \t]*(?:\d+|[ivxlcdm]+))?[ \t]*$)",
+    re.IGNORECASE,
+)
 _PRESENTATION_WRAPPERS = {"div", "p", "center", "span"}
 
 _table_formater = TableFormater()
@@ -65,6 +70,11 @@ def extract_inline_formulas(text: str, placeholder: str = "[FORMULA]") -> Tuple[
             return placeholder
         replaced = re.sub(pat, _sub, replaced)
     return replaced, formulas
+
+
+def normalize_toc_leaders_for_scoring(text: str) -> str:
+    """Remove dot leaders only from structurally valid table-of-contents lines."""
+    return _TOC_DOT_LEADER.sub(" ", text)
 
 
 def is_only_display_formula(block: str) -> bool:
@@ -218,6 +228,10 @@ def split_markdown(md: str, placeholder: str = "[FORMULA]", drop_img: bool = Tru
             return
 
         text_no_formula, inline_formulas = extract_inline_formulas(block, placeholder=placeholder)
+        text_no_formula = "\n".join(
+            normalize_toc_leaders_for_scoring(line)
+            for line in text_no_formula.split("\n")
+        )
         segments.append(Segment(type="text", raw=block, text_no_formula=text_no_formula, inline_formulas=inline_formulas))
 
     def process_chunk(chunk: str):
