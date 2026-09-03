@@ -47,6 +47,8 @@ IMG_PATTERN_MD_BROKEN_OPEN = re.compile(r"!\[[^\n]*$")
 
 # Markdown pipe table separator row: `|---|`, `| --- |`, `|:---:|` and variants
 _MD_TABLE_SEP = re.compile(r"^\s*\|?[\s\|\-:]+\|[\s\|\-:]*$")
+_ATX_HEADING_OPEN = re.compile(r"^ {0,3}#{1,6}(?:[ \t]+|$)")
+_ATX_HEADING_CLOSE = re.compile(r"[ \t]+#+[ \t]*$")
 _PRESENTATION_WRAPPERS = {"div", "p", "center", "span"}
 
 _table_formater = TableFormater()
@@ -65,6 +67,19 @@ def extract_inline_formulas(text: str, placeholder: str = "[FORMULA]") -> Tuple[
             return placeholder
         replaced = re.sub(pat, _sub, replaced)
     return replaced, formulas
+
+
+def normalize_text_for_scoring(text: str) -> str:
+    """Remove Markdown ATX heading markers from text used for scoring only."""
+    normalized_lines: List[str] = []
+    for line in text.splitlines(keepends=True):
+        content = line.rstrip("\r\n")
+        line_ending = line[len(content):]
+        if _ATX_HEADING_OPEN.match(content):
+            content = _ATX_HEADING_OPEN.sub("", content, count=1)
+            content = _ATX_HEADING_CLOSE.sub("", content, count=1)
+        normalized_lines.append(content + line_ending)
+    return "".join(normalized_lines)
 
 
 def is_only_display_formula(block: str) -> bool:
@@ -218,6 +233,7 @@ def split_markdown(md: str, placeholder: str = "[FORMULA]", drop_img: bool = Tru
             return
 
         text_no_formula, inline_formulas = extract_inline_formulas(block, placeholder=placeholder)
+        text_no_formula = normalize_text_for_scoring(text_no_formula)
         segments.append(Segment(type="text", raw=block, text_no_formula=text_no_formula, inline_formulas=inline_formulas))
 
     def process_chunk(chunk: str):
