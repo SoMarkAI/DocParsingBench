@@ -1,3 +1,4 @@
+import bisect
 import re
 from dataclasses import dataclass
 from typing import List, Literal, Optional, Dict, Any, Tuple
@@ -47,6 +48,20 @@ IMG_PATTERN_MD_BROKEN_OPEN = re.compile(r"!\[[^\n]*$")
 
 # Markdown pipe table separator row: `|---|`, `| --- |`, `|:---:|` and variants
 _MD_TABLE_SEP = re.compile(r"^\s*\|?[\s\|\-:]+\|[\s\|\-:]*$")
+_ATX_HEADING_OPEN = re.compile(r"^ {0,3}#{1,6}(?:[ \t]+|$)")
+_ATX_HEADING_CLOSE = re.compile(r"[ \t]+#+[ \t]*$")
+_FENCED_CODE_OPEN = re.compile(r"^ {0,3}(`{3,}|~{3,})([^\r\n]*)$")
+_TOC_DOT_LEADER = re.compile(
+    r"(?<=\S)[ \t]*(?:\.[ \t]*){4,}"
+    r"(?=(?:\d+|[ivxlcdm]+)(?:[ \t]*[-\u2013\u2014][ \t]*(?:\d+|[ivxlcdm]+))?[ \t]*$)",
+    re.IGNORECASE,
+)
+_TOC_SECTION_HEADING = re.compile(
+    r"^ {0,3}(?:#{1,6}[ \t]+)?"
+    r"(?:table[ \t]+of[ \t]+contents|contents|目[ \t]*录)"
+    r"(?:[ \t]+#+[ \t]*)?$",
+    re.IGNORECASE,
+)
 _PRESENTATION_WRAPPERS = {"div", "p", "center", "span"}
 
 _table_formater = TableFormater()
@@ -65,6 +80,87 @@ def extract_inline_formulas(text: str, placeholder: str = "[FORMULA]") -> Tuple[
             return placeholder
         replaced = re.sub(pat, _sub, replaced)
     return replaced, formulas
+
+
+def normalize_text_for_scoring(text: str, *, normalize_toc_leaders: bool = False) -> str:
+    """Remove presentation-only Markdown syntax from a text scoring view."""
+    normalized_lines: List[str] = []
+    for line in text.splitlines(keepends=True):
+        content = line.rstrip("\r\n")
+        line_ending = line[len(content):]
+        if _ATX_HEADING_OPEN.match(content):
+            content = _ATX_HEADING_OPEN.sub("", content, count=1)
+            content = _ATX_HEADING_CLOSE.sub("", content, count=1)
+        if normalize_toc_leaders:
+            content = _TOC_DOT_LEADER.sub(" ", content)
+        normalized_lines.append(content + line_ending)
+    return "".join(normalized_lines)
+
+
+def _fenced_code_contexts(lines: List[str]) -> List[bool]:
+    """Mark fenced lines, including mismatched closers and unclosed fences."""
+    contexts: List[bool] = []
+    fence_char: Optional[str] = None
+    fence_length = 0
+    for line in lines:
+        if fence_char is None:
+            match = _FENCED_CODE_OPEN.match(line)
+            if match:
+                marker = match.group(1)
+                # CommonMark backtick fence info strings cannot contain backticks.
+                if marker[0] == "~" or "`" not in match.group(2):
+                    fence_char = marker[0]
+                    fence_length = len(marker)
+                    contexts.append(True)
+                    continue
+            contexts.append(False)
+            continue
+
+        contexts.append(True)
+        if re.match(
+            rf"^ {{0,3}}{re.escape(fence_char)}{{{fence_length},}}[ \t]*$",
+            line,
+        ):
+            fence_char = None
+            fence_length = 0
+    return contexts
+
+
+def _confirmed_toc_line_contexts(lines: List[str], fenced: List[bool]) -> List[bool]:
+    """Confirm TOC rows by an explicit heading or a run of two or more rows."""
+    candidates = [
+        not fenced[index] and bool(_TOC_DOT_LEADER.search(line))
+        for index, line in enumerate(lines)
+    ]
+    confirmed = [False] * len(lines)
+
+    start = 0
+    while start < len(lines):
+        if not candidates[start]:
+            start += 1
+            continue
+        end = start + 1
+        while end < len(lines) and candidates[end]:
+            end += 1
+        if end - start >= 2:
+            confirmed[start:end] = [True] * (end - start)
+        start = end
+
+    in_toc_section = False
+    for index, line in enumerate(lines):
+        if fenced[index]:
+            in_toc_section = False
+            continue
+        if _TOC_SECTION_HEADING.fullmatch(line):
+            in_toc_section = True
+            continue
+        if not in_toc_section or not line.strip():
+            continue
+        if candidates[index]:
+            confirmed[index] = True
+        else:
+            in_toc_section = False
+    return confirmed
 
 
 def is_only_display_formula(block: str) -> bool:
@@ -183,13 +279,26 @@ def split_markdown(md: str, placeholder: str = "[FORMULA]", drop_img: bool = Tru
     segments: List[Segment] = []
     # Normalize once at markdown-line level to avoid repeated per-block normalization.
     normalized_md = normalize_markdown(md)
+    document_lines = normalized_md.splitlines()
+    fenced_contexts = _fenced_code_contexts(document_lines)
+    toc_contexts = _confirmed_toc_line_contexts(document_lines, fenced_contexts)
+    line_starts = [0]
+    line_starts.extend(match.end() for match in re.finditer(r"\n", normalized_md))
 
-    def append_segment(block: str):
+    def line_index_at(offset: int) -> int:
+        return max(0, bisect.bisect_right(line_starts, offset) - 1)
+
+    def append_segment(
+        block: str,
+        *,
+        in_fenced_code: bool = False,
+        normalize_toc_leaders: bool = False,
+    ):
         if not block.strip():
             return
 
         stripped = block.strip()
-        if (
+        if not in_fenced_code and (
             IMG_PATTERN_MD.fullmatch(stripped)
             or IMG_PATTERN_HTML.fullmatch(stripped)
             or IMG_PATTERN_HTML_NONSTANDARD.fullmatch(stripped)
@@ -201,38 +310,51 @@ def split_markdown(md: str, placeholder: str = "[FORMULA]", drop_img: bool = Tru
                 segments.append(Segment(type="image", raw=stripped))
             return
 
-        if drop_img:
+        if drop_img and not in_fenced_code:
             block = drop_image_tokens(block)
             if not block.strip():
                 return
 
-        if is_only_display_formula(block):
+        if not in_fenced_code and is_only_display_formula(block):
             m = re.fullmatch(r"(?:\$\$|\\\[)([\s\S]+?)(?:\$\$|\\\])", block)
             formula = m.group(1) if m else block
             segments.append(Segment(type="display_formula", raw=formula))
             return
 
-        if is_markdown_table(block):
+        if not in_fenced_code and is_markdown_table(block):
             table_html = _table_formater.to_html(block)
             segments.append(Segment(type="table", raw=table_html))
             return
 
-        text_no_formula, inline_formulas = extract_inline_formulas(block, placeholder=placeholder)
+        if in_fenced_code:
+            text_no_formula = block
+            inline_formulas = []
+        else:
+            text_no_formula, inline_formulas = extract_inline_formulas(
+                block, placeholder=placeholder
+            )
+            text_no_formula = normalize_text_for_scoring(
+                text_no_formula,
+                normalize_toc_leaders=normalize_toc_leaders,
+            )
         segments.append(Segment(type="text", raw=block, text_no_formula=text_no_formula, inline_formulas=inline_formulas))
 
-    def process_chunk(chunk: str):
+    def process_chunk(chunk: str, start_offset: int):
         lines = chunk.splitlines()
-        buffer: List[str] = []
+        buffer: List[Tuple[str, bool, bool]] = []
+        local_offset = 0
 
         def flush_buffer():
             if not buffer:
                 return
-            block = "\n".join(buffer)
+            buffered = list(buffer)
+            block = "\n".join(line for line, _, _ in buffered)
+            block_is_fenced = any(in_fence for _, in_fence, _ in buffered)
             buffer.clear()
             if not block.strip():
                 return
 
-            if (
+            if not block_is_fenced and (
                 IMG_PATTERN_MD.fullmatch(block)
                 or IMG_PATTERN_HTML.fullmatch(block)
                 or is_only_display_formula(block)
@@ -241,27 +363,36 @@ def split_markdown(md: str, placeholder: str = "[FORMULA]", drop_img: bool = Tru
                 append_segment(block)
                 return
 
-            for line in block.splitlines():
+            for line, in_fence, normalize_toc in buffered:
                 if line.strip():
-                    append_segment(line)
+                    append_segment(
+                        line,
+                        in_fenced_code=in_fence,
+                        normalize_toc_leaders=normalize_toc,
+                    )
 
         for ln in lines:
+            index = line_index_at(start_offset + local_offset)
             if not ln.strip():
                 flush_buffer()
             else:
-                buffer.append(ln)
+                buffer.append((ln, fenced_contexts[index], toc_contexts[index]))
+            local_offset += len(ln) + 1
         flush_buffer()
 
     pos = 0
     for m in TABLE_PATTERN.finditer(normalized_md):
         pre = normalized_md[pos:m.start()]
         if pre:
-            process_chunk(pre)
-        table_html = _table_formater.to_html(m.group(0))
-        segments.append(Segment(type="table", raw=table_html))
+            process_chunk(pre, pos)
+        if fenced_contexts[line_index_at(m.start())]:
+            process_chunk(m.group(0), m.start())
+        else:
+            table_html = _table_formater.to_html(m.group(0))
+            segments.append(Segment(type="table", raw=table_html))
         pos = m.end()
     tail = normalized_md[pos:]
     if tail:
-        process_chunk(tail)
+        process_chunk(tail, pos)
 
     return segments
