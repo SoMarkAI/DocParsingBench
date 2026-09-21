@@ -135,6 +135,26 @@ Key options:
   - See the [FastCDM chromedriver installation guide](https://github.com/BinyangQiu/FastCDM/blob/main/docs/chromedriver_installation.md)
 - `visualize`: whether to generate CDM visualization images during evaluation (effective only when `formula.metric: "CDM"`). Output images are saved in `<output>/cdm_vis/`.
 
+### Canonical Markdown input contract
+
+DPB evaluates one shared Markdown contract; model-specific adapters belong in the inference/integration layer, not in the scorer. Adapters must be deterministic, GT-blind, versioned, and preserve the model's raw structured response for audit. Before a formal run:
+
+- emit headings as Markdown headings (`#` through `######`), not `<h1>` through `<h6>`;
+- emit display formulas as `$$...$$` or `\[...\]`, not `<math>...</math>`;
+- emit tables as HTML `<table>...</table>` or valid Markdown pipe tables;
+- preserve all non-empty model output, including repeated or truncated output, unless a documented model-owned serializer defines otherwise.
+
+Run the generic preflight before scoring:
+
+```bash
+dpb validate \
+  --gt gt_dir/ \
+  --pred pred_dir/ \
+  --out validation.json
+```
+
+The validator reports missing, extra, and empty files, plus unsupported HTML math and non-canonical HTML heading blocks. It does not read GT content or rewrite model output. Coverage errors return a non-zero exit status; markup warnings remain advisory.
+
 ### Local Development With fastcdm Source
 
 To use local `fastcdm` source code instead of an installed package, set `FASTCDM_SRC` to the source root:

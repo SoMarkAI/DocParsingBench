@@ -8,6 +8,7 @@ from docparsingbench.config.schema import load_config
 from docparsingbench.core import evaluate_pair, evaluate_single
 from docparsingbench.labels import LabelsError, resolve_labels_path
 from docparsingbench.markdown_segmenter import split_markdown, normalize_markdown
+from docparsingbench.validation import validate_prediction_directory
 
 def viz_launch(*args, **kwargs):
     # Keep lazy import here to avoid importing visualization stack for non-visualize commands.
@@ -298,6 +299,30 @@ def cmd_segment(args):
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def cmd_validate(args):
+    out_path = _ensure_output_path(Path(args.out))
+    result = validate_prediction_directory(
+        Path(args.pred),
+        gt_dir=Path(args.gt) if args.gt else None,
+    )
+    out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    summary = result["summary"]
+    print(
+        "SUMMARY|"
+        f"Status={summary['status']}|"
+        f"Predictions={summary['prediction_files']}|"
+        f"Expected={summary['expected_files']}|"
+        f"Missing={summary['missing_files']}|"
+        f"Extra={summary['extra_files']}|"
+        f"Empty={summary['empty_files']}|"
+        f"UnsupportedHtmlMath={summary['unsupported_html_math_blocks']}|"
+        f"HtmlHeadings={summary['noncanonical_html_heading_blocks']}|"
+        f"Output={out_path}"
+    )
+    if summary["status"] == "error":
+        raise SystemExit(1)
+
+
 def _segment_payload(md: str, drop_img: bool) -> List[Dict[str, Any]]:
     segs = split_markdown(md, drop_img=drop_img)
     return [
@@ -428,6 +453,19 @@ def main():
     p_seg.add_argument("--in", dest="infile", required=True)
     p_seg.add_argument("--out", required=True)
     p_seg.set_defaults(func=cmd_segment)
+
+    p_validate = sub.add_parser(
+        "validate",
+        help="Validate prediction Markdown against the canonical DPB input contract",
+    )
+    p_validate.add_argument("--pred", required=True, help="Prediction Markdown directory")
+    p_validate.add_argument(
+        "--gt",
+        default=None,
+        help="Optional GT Markdown directory used only to check missing and extra files",
+    )
+    p_validate.add_argument("--out", required=True, help="Output validation report JSON")
+    p_validate.set_defaults(func=cmd_validate)
 
     p_seg_report = sub.add_parser("segment-report", help="Generate a markdown report of normalized and final segmentation results")
     p_seg_report.add_argument("--gt", required=True, help="Path to ground truth markdown directory")

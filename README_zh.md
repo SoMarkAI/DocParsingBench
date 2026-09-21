@@ -140,6 +140,26 @@ pip install -e .
     - chromedriver的安装可以看[FastCDM的安装教程](https://github.com/BinyangQiu/FastCDM/blob/main/docs/chromedriver_installation.md)
 * `visualize`：是否在评测时生成 CDM 可视化图片（仅在 `formula.metric: "CDM"` 时生效）。启用后图片保存到 `<output>/cdm_vis/` 目录。
 
+### 规范 Markdown 输入契约
+
+DPB 只评测一套共享 Markdown 契约；模型专属 adapter 应位于推理/接入层，不应写进计分器。adapter 必须确定性、不可读取 GT、锁定版本，并保留模型原始结构化响应供审计。正式跑分前应满足：
+
+- 标题使用 Markdown `#` 到 `######`，不要输出 `<h1>` 到 `<h6>`；
+- 行间公式使用 `$$...$$` 或 `\[...\]`，不要输出 `<math>...</math>`；
+- 表格使用 HTML `<table>...</table>` 或合法的 Markdown 管道表格；
+- 保留所有非空模型输出，包括重复或截断内容；只有模型官方且已记录的序列化规则可以例外。
+
+正式计分前先运行通用体检：
+
+```bash
+dpb validate \
+  --gt gt_dir/ \
+  --pred pred_dir/ \
+  --out validation.json
+```
+
+体检会报告缺失、额外、空文件，以及未支持的 HTML 公式和非规范 HTML 标题；它不会读取 GT 内容，也不会改写模型输出。覆盖错误会返回非零退出码，标记格式警告仍是提示性质。
+
 ### 本地开发：使用 fastcdm 源码
 
 若需要直接使用本地的 fastcdm 源码而非已安装的包，设置环境变量 `FASTCDM_SRC` 指向源码根目录即可：
