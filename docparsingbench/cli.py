@@ -317,6 +317,7 @@ def cmd_validate(args):
         f"Empty={summary['empty_files']}|"
         f"UnsupportedHtmlMath={summary['unsupported_html_math_blocks']}|"
         f"HtmlHeadings={summary['noncanonical_html_heading_blocks']}|"
+        f"EmbeddedDisplayMath={summary['embedded_display_math_blocks']}|"
         f"Output={out_path}"
     )
     if summary["status"] == "error":

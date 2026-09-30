@@ -140,7 +140,7 @@ Key options:
 DPB evaluates one shared Markdown contract; model-specific adapters belong in the inference/integration layer, not in the scorer. Adapters must be deterministic, GT-blind, versioned, and preserve the model's raw structured response for audit. Before a formal run:
 
 - emit headings as Markdown headings (`#` through `######`), not `<h1>` through `<h6>`;
-- emit display formulas as `$$...$$` or `\[...\]`, not `<math>...</math>`;
+- emit display formulas as blank-line-delimited `$$...$$` or `\[...\]` blocks, not `<math>...</math>` or formulas embedded in surrounding text;
 - emit tables as HTML `<table>...</table>` or valid Markdown pipe tables;
 - preserve all non-empty model output, including repeated or truncated output, unless a documented model-owned serializer defines otherwise.
 
@@ -153,7 +153,7 @@ dpb validate \
   --out validation.json
 ```
 
-The validator reports missing, extra, and empty files, plus unsupported HTML math and non-canonical HTML heading blocks. It does not read GT content or rewrite model output. Coverage errors return a non-zero exit status; markup warnings remain advisory.
+The validator reports missing, extra, and empty files, plus unsupported HTML math, non-canonical HTML heading blocks, and complete display-math delimiters embedded in text blocks. It does not read GT content or rewrite model output. Coverage errors return a non-zero exit status; markup warnings remain advisory.
 
 ### Local Development With fastcdm Source
 

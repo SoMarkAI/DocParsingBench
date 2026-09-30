@@ -14,6 +14,7 @@ def test_validate_markdown_flags_noncanonical_structure():
 
     assert result["unsupported_html_math_count"] == 1
     assert result["noncanonical_html_heading_count"] == 1
+    assert result["embedded_display_math_count"] == 0
     assert result["segment_counts"]["display_formula"] == 0
     assert result["segment_counts"]["table"] == 1
     assert result["warnings"] == [
@@ -30,6 +31,30 @@ def test_validate_markdown_ignores_html_examples_and_table_cells():
 
     assert result["unsupported_html_math_count"] == 0
     assert result["noncanonical_html_heading_count"] == 0
+    assert result["embedded_display_math_count"] == 0
+
+
+def test_validate_markdown_flags_complete_display_math_embedded_in_text_block():
+    result = validate_markdown("Introduction\n$$\nx + y\n$$\n(6)\n")
+
+    assert result["segment_counts"]["display_formula"] == 0
+    assert result["embedded_display_math_count"] == 1
+    assert result["warnings"] == ["embedded_display_math"]
+
+
+def test_validate_markdown_accepts_isolated_multiline_display_math():
+    result = validate_markdown("Introduction\n\n$$\nx + y\n$$\n\n(6)\n")
+
+    assert result["segment_counts"]["display_formula"] == 1
+    assert result["embedded_display_math_count"] == 0
+    assert result["warnings"] == []
+
+
+def test_validate_markdown_does_not_pair_stray_delimiters_across_paragraphs():
+    result = validate_markdown("first fragment $$\n\nsecond fragment $$\n")
+
+    assert result["embedded_display_math_count"] == 0
+    assert result["warnings"] == []
 
 
 def test_validate_prediction_directory_checks_coverage_and_empty_files(tmp_path):
@@ -63,6 +88,19 @@ def test_validate_prediction_directory_treats_extra_files_as_error(tmp_path):
 
     assert result["summary"]["status"] == "error"
     assert result["extra_files"] == ["extra.md"]
+
+
+def test_validate_prediction_directory_summarizes_embedded_display_math(tmp_path):
+    pred_dir = tmp_path / "pred"
+    pred_dir.mkdir()
+    (pred_dir / "a.md").write_text("$$\nx + y\n$$\n(6)\n", encoding="utf-8")
+
+    result = validate_prediction_directory(pred_dir)
+
+    assert result["summary"]["status"] == "warning"
+    assert result["summary"]["embedded_display_math_files"] == 1
+    assert result["summary"]["embedded_display_math_blocks"] == 1
+    assert result["embedded_display_math_files"] == ["a.md"]
 
 
 def test_cmd_validate_returns_nonzero_for_coverage_errors(tmp_path):

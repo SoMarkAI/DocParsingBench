@@ -10,6 +10,7 @@ HTML_HEADING_PATTERN = re.compile(r"<h[1-6]\b[\s\S]*?</h[1-6]>", re.IGNORECASE)
 FENCED_CODE_PATTERN = re.compile(r"(?:```|~~~)[\s\S]*?(?:```|~~~)")
 INLINE_CODE_PATTERN = re.compile(r"`[^`\n]*`")
 HTML_TABLE_PATTERN = re.compile(r"<table\b[\s\S]*?</table>", re.IGNORECASE)
+DISPLAY_MATH_PATTERN = re.compile(r"\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]")
 
 
 def _diagnostic_text(markdown: str) -> str:
@@ -17,6 +18,14 @@ def _diagnostic_text(markdown: str) -> str:
     text = FENCED_CODE_PATTERN.sub(" ", markdown)
     text = INLINE_CODE_PATTERN.sub(" ", text)
     return HTML_TABLE_PATTERN.sub(" ", text)
+
+
+def _complete_display_math_count(markdown: str) -> int:
+    """Count complete delimiters without pairing stray markers across paragraphs."""
+    return sum(
+        len(DISPLAY_MATH_PATTERN.findall(block))
+        for block in re.split(r"\n[ \t]*\n+", markdown)
+    )
 
 
 def validate_markdown(markdown: str) -> Dict[str, Any]:
@@ -29,17 +38,25 @@ def validate_markdown(markdown: str) -> Dict[str, Any]:
     diagnostic_text = _diagnostic_text(markdown)
     unsupported_html_math = len(HTML_MATH_PATTERN.findall(diagnostic_text))
     noncanonical_html_headings = len(HTML_HEADING_PATTERN.findall(diagnostic_text))
+    complete_display_math = _complete_display_math_count(diagnostic_text)
+    canonical_display_math = sum(
+        segment.type == "display_formula" for segment in split_markdown(diagnostic_text)
+    )
+    embedded_display_math = max(0, complete_display_math - canonical_display_math)
     warnings: List[str] = []
     if unsupported_html_math:
         warnings.append("unsupported_html_math")
     if noncanonical_html_headings:
         warnings.append("noncanonical_html_heading")
+    if embedded_display_math:
+        warnings.append("embedded_display_math")
 
     return {
         "empty": not markdown.strip(),
         "segment_counts": segment_counts,
         "unsupported_html_math_count": unsupported_html_math,
         "noncanonical_html_heading_count": noncanonical_html_headings,
+        "embedded_display_math_count": embedded_display_math,
         "warnings": warnings,
     }
 
@@ -77,8 +94,15 @@ def validate_prediction_directory(
     noncanonical_html_heading_files = sorted(
         report["file"] for report in reports if report["noncanonical_html_heading_count"]
     )
+    embedded_display_math_files = sorted(
+        report["file"] for report in reports if report["embedded_display_math_count"]
+    )
     error_count = len(missing_files) + len(extra_files) + len(empty_files)
-    warning_count = len(unsupported_html_math_files) + len(noncanonical_html_heading_files)
+    warning_count = (
+        len(unsupported_html_math_files)
+        + len(noncanonical_html_heading_files)
+        + len(embedded_display_math_files)
+    )
     status = "error" if error_count else "warning" if warning_count else "ok"
 
     return {
@@ -97,11 +121,16 @@ def validate_prediction_directory(
             "noncanonical_html_heading_blocks": sum(
                 report["noncanonical_html_heading_count"] for report in reports
             ),
+            "embedded_display_math_files": len(embedded_display_math_files),
+            "embedded_display_math_blocks": sum(
+                report["embedded_display_math_count"] for report in reports
+            ),
         },
         "missing_files": missing_files,
         "extra_files": extra_files,
         "empty_files": empty_files,
         "unsupported_html_math_files": unsupported_html_math_files,
         "noncanonical_html_heading_files": noncanonical_html_heading_files,
+        "embedded_display_math_files": embedded_display_math_files,
         "reports": reports,
     }
