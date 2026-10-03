@@ -153,6 +153,10 @@ export FASTCDM_SRC=/path/to/fastcdm
 
 ## 使用
 
+历史跑分涉及的公式分块、Surya 格式转换和输入校验，见
+[复现说明](./reproduction/README.md)。这些步骤需显式选择，不改评分器。
+说明也列出了公开复现还需补齐的模型、预测产物和运行环境；模型名称相同不等于能复现历史分数。
+
 ### 评测
 
 `dpb` 已经被打包为命令行工具，他等同于 `python -m docparsingbench.cli`。

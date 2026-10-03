@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "scope": "Audited historical inputs, not a replacement for the older public README leaderboard",
+  "dataset": {
+    "repository": "SoMarkAI/DocParsingBench",
+    "provider": "huggingface",
+    "revision": "907ca67e0dce06cf2bfcc51b3335b0b3b1f3e3f7",
+    "pages": 1400,
+    "ground_truth_collection_sha256": "25185917d61f2b0f86dd0698e49f61b559a16cccaf3e8584db4826345050881f"
+  },
+  "evaluator": {
+    "dpb_commit": "63d80f96a89e2f2514daac703238d6f12a2873e9",
+    "fastcdm_commit": "ef5206caa4de87abbf39510678d12681c20a74f2",
+    "config_sha256": "361a55280d032c4e534dab336b309b17c2a750c837936be7d03fe28c6a4a53b2",
+    "config_file": "scoring.yaml",
+    "image_id": "sha256:a7d676ecb3c732fbcee1883ed1f67693e34dad35b5df64daab551456e4d87480",
+    "public_image_reference": null,
+    "eligible_reports": 1342,
+    "original_chemical_skip_pages": 58,
+    "scoring_changed": false,
+    "exact_score_repeatability_guaranteed": false
+  },
+  "verification": {
+    "input_integrity": "verified locally for all nine models",
+    "preparation_replay": "verified against retained predictions for OXR, Surya, MinerU and corrected Paddle",
+    "fresh_inference": "not run in this audit",
+    "full_chrome_scoring": "not run in this audit",
+    "public_end_to_end_reproduction": "incomplete; missing artifact URLs and environment lock"
+  },
+  "models": {
+    "oxr": {
+      "name": "OXR-1.0",
+      "preparation_profile": "display-math-v1",
+      "prediction_collection_sha256": "e3fb659fd7b32c7e566aeb7fe4e7d379dfe47ac61658e03466901165604f5a8f",
+      "retained_result_sha256": "0677d583292549c6dd0e65712fa5caf711c73645904e28b3c5a2975dd4287a74",
+      "model_assets": {
+        "weights_sha256": "795bb2f1faac579f58829913f2c606202531a96c1203e19ef7a70b103fb7ea51"
+      },
+      "source_commits": {
+        "oxr_commit": "ecbe8c5f8f06c799322ff92c4ee5a66f629e188b"
+      },
+      "inference": {
+        "sampling": {
+          "temperature": 0,
+          "top_p": 1,
+          "repetition_penalty": 1
+        },
+        "keep_header_footer": false,
+        "element_formats": {
+          "image": "none",
+          "formula": "latex",
+          "table": "html",
+          "cs": "smiles"
+        },
+        "max_model_len": 8192,
+        "max_output_tokens": 8000
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null,
+      "layout_assets": {
+        "model_id": "dfine_stage2_20260714_best",
+        "weights_sha256": "1460d2c416113134d889ed95641595dce5b9994a3efb673fc21cd161aa27439e"
+      },
+      "compatibility_patch": "patches/oxr-complete-reading-order.patch",
+      "historical_layout_public_artifact": null,
+      "source_collection_sha256": "75bdf11aed4c8f0520e7a6b88f72c11ddbe4b44dd51537acc7f81456a8173d1e",
+      "preparation_replay_verified_pages": 1400,
+      "changed_markdown_files": 61
+    },
+    "teleocr": {
+      "name": "TeleOCR",
+      "preparation_profile": "identity-v1",
+      "prediction_collection_sha256": "cf49500438182e56ffe2f7f05c69da4e83cade58d394aca15617b8c1569a7308",
+      "retained_result_sha256": "38afc8cf482ec788fe0c1a09e51e9b881670b7cd3babd07cf1f65611bb92df2a",
+      "model_assets": {
+        "source": "StarDoc-AI/TeleOCR",
+        "model_safetensors_sha256": "9817b18041bd96403f75e38a33b28ed0cd5fb2641f67eead673afabd3c408109",
+        "config_sha256": "92c5e15f1768dcb54bceae170043fbfefd248508159700b2179824b88c33ae75",
+        "preprocessor_config_sha256": "f2058c716eef96ccaed1cc1e2d0c08306b62586d535b28d9d08e691b2fab7ca0",
+        "tokenizer_sha256": "9c5ae00e602b8860cbd784ba82a8aa14e8feecec692e7076590d014d7b7fdafa"
+      },
+      "source_commits": {
+        "teleocr_commit": "9921cffe380efe4e2fa010258b3d0c3cb70bab2d"
+      },
+      "inference": {
+        "backend": "vllm-async-engine",
+        "layout_mode": "Detection",
+        "max_model_len": 16384,
+        "gpu_memory_utilization": 0.82,
+        "prompt": "Official TeleOCR two-step parser prompts from TeleOCR_client.py, including Analyze the image layout and block-type-specific extraction prompts",
+        "post_processing": "Official TeleOCR parser converts table OTSL to HTML, wraps equations, orders layout blocks, and writes page Markdown; no additional semantic cleanup",
+        "vllm_version": "0.11.0"
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null,
+      "compatibility_patch": "patches/teleocr-default-language.patch"
+    },
+    "dots-mocr": {
+      "name": "dots.mocr",
+      "preparation_profile": "identity-v1",
+      "prediction_collection_sha256": "5b2b974016ff38141610f047c51dc59f3ec3263519f26be5e8b0a9673d51b4dc",
+      "retained_result_sha256": "c75fa9987e89db2453519b1aea803f4d8d8c2606b09bfa6cb57446ef6cfea68e",
+      "model_assets": {
+        "source": "rednote-hilab/dots.mocr",
+        "model_shard_1_sha256": "d8f4bc75340279da003609fe93f2eb02cc1a77087f5dfb6ba46c0980e1b4da81",
+        "model_shard_2_sha256": "0101b36fe6620ba135d4bb8efbbf275fc27b4363b10b7f632c058c0955f3dc4d",
+        "config_sha256": "41d5c9aad72c730bb97062cab7a59cdb1d427eeec0b7a6e2f95e1ee72ad3b498",
+        "preprocessor_config_sha256": "fec8b3187ab0ae340f6d0b1f6f892a53c63b73b328836c83dd7bff1d5bc4c79a",
+        "tokenizer_sha256": "386545eb05f08c51352cde2fcc2c867f1592bb330f305efd1c6a57a93b1244cd"
+      },
+      "source_commits": {
+        "dots_mocr_commit": "23f3e5612fb8066d4034d5ecfc8f33a9243533eb"
+      },
+      "inference": {
+        "backend": "official-dots-mocr-vllm",
+        "max_model_len": 131072,
+        "gpu_memory_utilization": 0.85,
+        "prompt": "Official dots.mocr full-layout English prompt from dots_mocr/utils/prompts.py",
+        "prompt_mode": "prompt_layout_all_en",
+        "request_parameters": "temperature=0.1, top_p=1.0, max_completion_tokens=32768",
+        "post_processing": "Official dots.mocr output cleaner and layoutjson2md conversion; raw API responses are retained separately, and a non-empty raw response is used only if official conversion is empty",
+        "vllm_version": "0.27.1"
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null
+    },
+    "mineru": {
+      "name": "MinerU2.5-Pro-2605-1.2B",
+      "preparation_profile": "identity-v1",
+      "prediction_collection_sha256": "a799d5755604849523f78b343f3b0258ddc6318221d8f8c8093b751bdcad6cc3",
+      "retained_result_sha256": "e1b3fde14fd64e93d4d04efcb7d6fb253f12419dd872b2bcab4c6426d6517883",
+      "model_assets": {
+        "weights_sha256": "abf8681ca63b8dec7b67de257af47b821f179442f72998d0696ae2ed9232a5f0"
+      },
+      "source_commits": {},
+      "inference": {
+        "max_model_len": 8192,
+        "sampling": {
+          "temperature": 0,
+          "top_p": 1
+        },
+        "runtime_note": "vLLM 0.14.1.dev1 + Transformers 4.57.6 + mineru-vl-utils 1.0.5; newer vLLM 0.25.1 / Transformers 5.13.1 produced invalid length-truncated layout tokens in smoke"
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null,
+      "source_collection_sha256": "a799d5755604849523f78b343f3b0258ddc6318221d8f8c8093b751bdcad6cc3",
+      "preparation_replay_verified_pages": 1400,
+      "changed_markdown_files": 0
+    },
+    "infinity-parser2-pro": {
+      "name": "Infinity-Parser2-Pro",
+      "preparation_profile": "identity-v1",
+      "prediction_collection_sha256": "07ea1904db639f3b32e7e96e68645cd93e580a38598b42f7f804516862219016",
+      "retained_result_sha256": "2b5c844594e7e91f933c80215d054e92741a91dd58825ce69753da3e00531981",
+      "model_assets": {
+        "source": "infly/Infinity-Parser2-Pro",
+        "snapshot_revision": "689c7b6486f0f1524a2cff1fe2cba9eac4716ea0",
+        "config_sha256": "010e2c1574a38bf9da8182b323f873a6eeb4789a5223b1939dbe63f048fa3f56",
+        "processor_config_sha256": "14932921ca485d458a04dafd8069fbb0a4505622a48208d19ed247115801385b",
+        "tokenizer_sha256": "87a7830d63fcf43bf241c3c5242e96e62dd3fdc29224ca26fed8ea333db72de4",
+        "model_index_sha256": "32194669cb7b31df75861c49f4011968dd1821eb23dc9055b9048cc1934c19f4",
+        "chat_template_revision": "913e162144c61dee741babb01cf8f2ec1ffb57f3",
+        "chat_template_sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715"
+      },
+      "source_commits": {
+        "infinity_parser2_commit": "5089819e7dfaefee1308714c64fa9bfdfc3fbde8"
+      },
+      "inference": {
+        "backend": "official-infinity-parser2-vllm-server",
+        "max_model_len": 65536,
+        "max_num_seqs": 64,
+        "gpu_memory_utilization": 0.92,
+        "prompt": "Official PROMPT_DOC2JSON from Infinity-Parser2 fixed source commit",
+        "prompt_mode": "doc2json",
+        "request_parameters": "temperature=0.0, top_p=1.0, max_tokens=32768",
+        "post_processing": "Official extract_json_content, incomplete-element truncation, bbox restoration, and convert_json_to_markdown with headers, footers, and page footnotes omitted",
+        "vllm_version": "0.27.1",
+        "tensor_parallel_size": 4,
+        "client_workers": 2
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null
+    },
+    "ovisocr2": {
+      "name": "OvisOCR2",
+      "preparation_profile": "identity-v1",
+      "prediction_collection_sha256": "99fb60d60b7321a016c9187c9cf01ddc760a6ab0115fb2f9416f59e2855435de",
+      "retained_result_sha256": "eee1cb46f083fddbe3db95bbc16977fdb234e0767616c3f92cd93caccde5d77d",
+      "model_assets": {
+        "weights_sha256": "9270560288656ece5cb3a6989001afcf5af8d223bceed4a423c33a008861d009"
+      },
+      "source_commits": {},
+      "inference": {
+        "max_output_tokens": 16384,
+        "sampling": {
+          "temperature": 0,
+          "top_p": 1
+        },
+        "official_inference": {
+          "enable_thinking": false,
+          "min_pixels": 200704,
+          "max_pixels": 8294400,
+          "truncated_repeat_cleanup": false
+        },
+        "accept_nonempty_length_verbatim": true,
+        "vllm_version": "0.22.1",
+        "prompt": "Extract all readable content from the image in natural human reading order and output the result as a single Markdown document. For charts or images, represent them using an HTML image tag: <img src=\"images/bbox_{left}_{top}_{right}_{bottom}.jpg\" />, where left, top, right, bottom are bounding box coordinates scaled to [0, 1000). Format formulas as LaTeX. Format tables as HTML: <table>...</table>. Transcribe all other text as standard Markdown. Preserve the original text without translation or paraphrasing.",
+        "markdown_serialization": "Strip API content outer whitespace; write UTF-8 without appending a newline",
+        "image_placeholder_filter": "Split Markdown on double newlines, omit blocks whose stripped content starts with <img src=\"images/bbox_, rejoin with double newlines and strip; this can remove accompanying text in the same block. No repeat cleanup in final predictions."
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null,
+      "response_artifact_kind": "Per-page status, usage and prediction checksum metadata; full API response content was not retained by the historical runner"
+    },
+    "qianfan-ocr": {
+      "name": "Qianfan-OCR",
+      "preparation_profile": "identity-v1",
+      "prediction_collection_sha256": "118851401c19dfeb47d0c21c2a337f1c8573e1ae4f343326cad20de1417742d9",
+      "retained_result_sha256": "c02c202573203815890438cb992184d932162644d4774c21db8c8cf2a13d4886",
+      "model_assets": {
+        "weights_sha256": [
+          "e2a59915dd6a1c51ccb11be3addf4585fcf0840ac4f63f8e9fb629db58f8db6e",
+          "96805d61fbb9523fd27a09ab40451d04da09e9ba4b102341eac0184d8f82a0b1"
+        ]
+      },
+      "source_commits": {},
+      "inference": {
+        "max_output_tokens": 16384,
+        "sampling": {
+          "temperature": 0,
+          "top_p": 1
+        },
+        "official_inference": {},
+        "accept_nonempty_length_verbatim": true,
+        "vllm_version": "0.27.1",
+        "prompt": "Parse this document to Markdown.",
+        "markdown_serialization": "Strip API content outer whitespace; write UTF-8 without appending a newline",
+        "image_placeholder_filter": "None"
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null,
+      "response_artifact_kind": "Per-page status, usage and prediction checksum metadata; full API response content was not retained by the historical runner"
+    },
+    "surya-ocr-2": {
+      "name": "Surya OCR 2",
+      "preparation_profile": "surya-html-v1",
+      "prediction_collection_sha256": "34dbc3433d3511254e08c99a4d68eced01eca94808f28f3d8512f50443f969a0",
+      "retained_result_sha256": "46e8a6f4b2e1ce6fd26fe81fcd8d543b9af3d17433a98636f9b79ac28226ef34",
+      "model_assets": {
+        "source": "datalab-to/surya-ocr-2",
+        "model_safetensors_sha256": "5755f82a997dd0b111964fa8b31cc2daef7aeb7a706bbd17d73d6a93ef3f723e",
+        "config_sha256": "d83e969a656380a048fc53818d391771a852d488d132d7b49f87661805de84ec",
+        "processor_config_sha256": "bea20de99600980eaa9022d59bc460ae8ff16e00c9655ff279c56b5390533beb",
+        "tokenizer_sha256": "7ecfe936390e39869c683e451974eb11d8c2d9057c42e68cd715098884809c05"
+      },
+      "source_commits": {
+        "surya_commit": "3a70081f6a60013dab818c82ab99451aa290f389"
+      },
+      "inference": {
+        "backend": "official-surya-vllm",
+        "max_model_len": 16384,
+        "gpu_memory_utilization": 0.85,
+        "prompt": "Official HIGH_ACCURACY_BBOX_PROMPT: OCR this image to HTML. Each block is a div with data-label and data-bbox (x0 y0 x1 y1, normalized 0-1000).",
+        "post_processing": "Official Surya full-page parser and fallback behavior; emitted non-empty block HTML is retained in reading order inside Markdown files without semantic rewriting",
+        "vllm_version": "0.27.1",
+        "surya_version": "0.22.1"
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null,
+      "source_collection_sha256": "f5af4b29f6ea3728674b3102703d29df746a5813f4339c727922b5bf25e1a833",
+      "preparation_replay_verified_pages": 1400,
+      "serializer_counts": {
+        "display_math_tags_converted": 911,
+        "html_heading_tags_converted": 2431,
+        "inline_math_tags_converted": 4677,
+        "section_headers_converted": 3062,
+        "skipped_or_error_blocks": 1309
+      }
+    },
+    "paddleocr-vl-1.6": {
+      "name": "PaddleOCR-VL-1.6",
+      "preparation_profile": "identity-v1",
+      "prediction_collection_sha256": "550f24580069cf744bb2be47e4c1b1e863698f34f647ee64844c7bc25cf03dfc",
+      "retained_result_sha256": "8e24ad44917c569a72cdafcf5fab0cc7a360efc6fc6b269f253f0f80d146b58b",
+      "model_assets": {
+        "vl_model_name": "PaddleOCR-VL-1.6-0.9B",
+        "model_safetensors_sha256": "85a479d506a11e724e7285d395c551be69f41dbc16b6342d3cacfb189aed71db",
+        "chat_template_sha256": "2f27812dab7f333e471884e0c803d807f11953d5453140dfb1aaba234f872bc8",
+        "layout_model": "PP-DocLayoutV3",
+        "layout_weights_sha256": "70bd316b0582769ec968829fd1feb1a6a58b7c941b938327e551b6b12b45c137"
+      },
+      "source_commits": {},
+      "inference": {
+        "max_model_len": 16384,
+        "max_num_seqs": 8,
+        "gpu_memory_utilization": 0.65,
+        "page_batch": 4,
+        "vl_rec_max_concurrency": 8,
+        "orientation_classify": false,
+        "doc_unwarping": false,
+        "use_queues": false,
+        "prompt": "Official v1.6 per-element prompts; model-supplied chat_template.jinja is explicitly selected.",
+        "observed_request_generation": {
+          "temperature": 0,
+          "max_completion_tokens": 4096,
+          "skip_special_tokens": true,
+          "mm_processor_kwargs": {
+            "min_pixels": 112896,
+            "max_pixels": 1003520
+          }
+        },
+        "output_policy": "Retain all nonempty stop/length responses, including repetitions and truncations. Official PaddleX pipeline formatting and repetitive-content handling remain unchanged and are recorded alongside raw VLM responses.",
+        "serialization": "Official save_to_markdown; strip surrounding whitespace and add one final newline. Historical external display-math audit changed zero pages; prepared predictions are byte-identical to the official export.",
+        "vllm": "0.19.1",
+        "paddleocr": "3.6.0",
+        "paddlex": "3.6.1",
+        "paddlepaddle_gpu": "3.2.1",
+        "python": "3.12.12",
+        "markdown_export": "official save_to_markdown; strip outer whitespace; append newline; no external cleanup"
+      },
+      "public_prediction_artifact": null,
+      "public_raw_response_artifact": null,
+      "complete_environment_lock": null,
+      "source_collection_sha256": "550f24580069cf744bb2be47e4c1b1e863698f34f647ee64844c7bc25cf03dfc",
+      "preparation_replay_verified_pages": 1400,
+      "changed_markdown_files": 0
+    }
+  }
+}

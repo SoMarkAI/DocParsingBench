@@ -1,0 +1,12 @@
+diff --git a/TeleOCR/tools/guess_suffix_or_lang.py b/TeleOCR/tools/guess_suffix_or_lang.py
+index b5752a8..c9448db 100644
+--- a/TeleOCR/tools/guess_suffix_or_lang.py
++++ b/TeleOCR/tools/guess_suffix_or_lang.py
+@@ -24,6 +24,7 @@ def code_content_clean(content):
+
+ def guess_language_by_text(code):
+     code = code_content_clean(code)
++    lang = DEFAULT_LANG
+     if code.startswith("<_"):
+         end = code.find("_>")
+         if end != -1:

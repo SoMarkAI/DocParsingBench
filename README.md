@@ -147,6 +147,11 @@ You can add this line to `~/.zshrc` or `~/.bashrc` for persistence. If not set, 
 
 ## Usage
 
+For recorded runs requiring prediction-side serialization fixes, see
+[Reproduction and input verification](./reproduction/README.md). These opt-in
+tools leave the evaluator unchanged and list the artifacts still needed for
+independent reproduction.
+
 ### Evaluation
 
 `dpb` is packaged as a CLI entrypoint and is equivalent to `python -m docparsingbench.cli`.

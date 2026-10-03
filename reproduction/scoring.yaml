@@ -1,0 +1,34 @@
+chromedriver_path: /usr/bin/chromedriver
+visualize: false
+drop_img: true
+skip_chemical: true
+
+paragraph:
+  match_metric: "NED"
+  formula_placeholder: "[FORMULA]"
+
+formula:
+  metric: "CDM"
+  match_metric: "NED"
+
+table:
+  structure_only: false
+  match_metric: "TEDS"
+
+DPB:
+  preset: "general"
+  alpha: 0.5
+  beta: 0.3
+  gamma: 0.2
+
+perf:
+  enable: true
+
+progress:
+  enable: true
+
+summary_chart:
+  enable: true
+  output_path: "summary_chart.png"
+  y_min: 30
+  y_max: 100

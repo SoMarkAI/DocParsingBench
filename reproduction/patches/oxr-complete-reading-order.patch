@@ -1,0 +1,28 @@
+--- a/oxr/pipeline/reading_order.py
++++ b/oxr/pipeline/reading_order.py
+@@ -81,10 +81,11 @@
+ ) -> list[int] | None:
+     """Repair a nearly complete, valid, unique partial permutation.
+
+-    Pages below 20 blocks may be missing one ID; larger pages may be missing two.
+-    The model's relative order is preserved. Geometry is used only to choose the
+-    omitted blocks' insertion points; malformed, duplicate, out-of-range, or more
+-    incomplete output remains an error.
++    An otherwise complete permutation may repeat IDs; those duplicates are removed
++    while preserving the first occurrence. Pages below 20 blocks may be missing one
++    ID; larger pages may be missing two. The model's relative order is preserved.
++    Geometry is used only to choose omitted blocks' insertion points; malformed,
++    out-of-range, or more incomplete output remains an error.
+     """
+     if not isinstance(raw_text, str) or _READING_ORDER_PATTERN.fullmatch(raw_text) is None:
+         return None
+@@ -93,6 +94,9 @@
+     block_count = len(blocks)
+     expected = set(range(block_count))
+     actual = set(order)
++    if actual == expected and len(order) > block_count:
++        return list(dict.fromkeys(order))
++
+     missing_count = block_count - len(order)
+     allowed_missing = min(2, max(1, block_count // 10))
+     if (
